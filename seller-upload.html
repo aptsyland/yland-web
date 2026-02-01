@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>YLAND – Upload Media</title>
+  <link rel="stylesheet" href="css/seller.css" />
+</head>
+<body>
+
+  <h1>Upload Property Media</h1>
+
+  <div id="info"></div>
+  <hr />
+
+  <!-- 📸 PHOTOS -->
+  <h3>Photos (.webp only)</h3>
+  <input type="file" id="photoInput" accept=".webp" />
+  <button id="uploadPhotoBtn">Upload Photo</button>
+  <ul id="photoList"></ul>
+
+  <hr />
+
+  <!-- 🎥 VIDEOS -->
+  <h3>Videos (.mp4 / .webm)</h3>
+  <input type="file" id="videoInput" accept=".mp4,.webm" />
+  <button id="uploadVideoBtn">Upload Video</button>
+  <ul id="videoList"></ul>
+
+  <hr />
+
+  <!-- 📄 DOCUMENTS -->
+  <h3>Documents (PDF / Images)</h3>
+  <input type="file" id="docInput" />
+  <button id="uploadDocBtn">Upload Document</button>
+  <ul id="docList"></ul>
+
+  <hr />
+
+  <button id="submitBtn">Submit Listing</button>
+
+  <script type="module" src="js/seller/upload.js"></script>
+</body>
+</html>

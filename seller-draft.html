@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>YLAND – Seller Draft</title>
+  <link rel="stylesheet" href="css/seller.css" />
+</head>
+<body>
+
+  <h1>Create / Edit Property Draft</h1>
+
+  <div id="draftStatus">Loading draft...</div>
+
+  <hr />
+
+  <form id="draftForm">
+
+    <label>Title</label><br />
+    <input type="text" id="title" /><br /><br />
+
+    <label>Category</label><br />
+    <select id="category">
+      <option value="">Select</option>
+      <option value="land">Land</option>
+      <option value="plot">Plot</option>
+      <option value="house">House</option>
+      <option value="villa">Villa</option>
+      <option value="apartment">Apartment</option>
+      <option value="jd">JD</option>
+      <option value="venture">Venture</option>
+    </select><br /><br />
+
+    <label>Price</label><br />
+    <input type="number" id="price" /><br /><br />
+
+    <button type="button" id="saveBtn">Save Draft</button>
+    <button type="button" id="nextBtn">Next: Upload Media</button>
+
+  </form>
+
+  <script type="module" src="js/seller/draft.js"></script>
+</body>
+</html>

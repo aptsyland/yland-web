@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>YLAND – Seller Dashboard</title>
+  <link rel="stylesheet" href="css/seller.css" />
+</head>
+<body>
+
+  <h1>Seller Dashboard</h1>
+
+  <!-- STATS -->
+  <div id="stats">
+    <span id="stat-pending">Pending: 0</span> |
+    <span id="stat-live">Live: 0</span> |
+    <span id="stat-expired">Expired: 0</span>
+  </div>
+
+  <hr />
+
+  <!-- LISTINGS -->
+  <table border="1" width="100%">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Price</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="listingRows">
+      <!-- JS fills here -->
+    </tbody>
+  </table>
+
+  <script type="module" src="js/seller/dashboard.js"></script>
+</body>
+</html>
