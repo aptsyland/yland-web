@@ -2,42 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>YLAND – Upload Media</title>
+  <title>Upload Media | YLAND</title>
   <link rel="stylesheet" href="css/seller.css" />
 </head>
 <body>
 
-  <h1>Upload Property Media</h1>
+<h2>📤 Upload Property Media</h2>
 
-  <div id="info"></div>
-  <hr />
+<div id="uploadStatus" class="info">
+  Upload your photos, videos, and documents
+</div>
 
-  <!-- 📸 PHOTOS -->
-  <h3>Photos (.webp only)</h3>
-  <input type="file" id="photoInput" accept=".webp" />
-  <button id="uploadPhotoBtn">Upload Photo</button>
-  <ul id="photoList"></ul>
+<form id="uploadForm">
 
-  <hr />
+  <label>
+    Photos (max 10)
+    <input type="file" id="photos" accept="image/*" multiple />
+  </label>
 
-  <!-- 🎥 VIDEOS -->
-  <h3>Videos (.mp4 / .webm)</h3>
-  <input type="file" id="videoInput" accept=".mp4,.webm" />
-  <button id="uploadVideoBtn">Upload Video</button>
-  <ul id="videoList"></ul>
+  <label>
+    Video (max 5 min)
+    <input type="file" id="video" accept="video/*" />
+  </label>
 
-  <hr />
+  <label>
+    Documents (PDF, max 10MB)
+    <input type="file" id="docs" accept="application/pdf" />
+  </label>
 
-  <!-- 📄 DOCUMENTS -->
-  <h3>Documents (PDF / Images)</h3>
-  <input type="file" id="docInput" />
-  <button id="uploadDocBtn">Upload Document</button>
-  <ul id="docList"></ul>
+  <button type="button" id="uploadBtn">
+    ⬆️ Upload Media
+  </button>
 
-  <hr />
+  <button type="button" id="submitBtn" disabled>
+    ✅ Submit for Review
+  </button>
 
-  <button id="submitBtn">Submit Listing</button>
+</form>
 
-  <script type="module" src="js/seller/upload.js"></script>
+<script src="js/utils/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/seller/upload.js"></script>
+
 </body>
 </html>

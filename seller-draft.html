@@ -2,42 +2,60 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>YLAND – Seller Draft</title>
+  <title>Seller Draft | YLAND</title>
   <link rel="stylesheet" href="css/seller.css" />
 </head>
 <body>
 
-  <h1>Create / Edit Property Draft</h1>
+  <h2>📝 Create / Resume Property Draft</h2>
 
-  <div id="draftStatus">Loading draft...</div>
-
-  <hr />
+  <div id="draftStatus" class="info">
+    Loading draft...
+  </div>
+<small id="validationMsg" style="color:red;"></small>
 
   <form id="draftForm">
 
-    <label>Title</label><br />
-    <input type="text" id="title" /><br /><br />
+    <label>
+      Property Title *
+      <input type="text" id="title" required />
+    </label>
 
-    <label>Category</label><br />
-    <select id="category">
-      <option value="">Select</option>
-      <option value="land">Land</option>
-      <option value="plot">Plot</option>
-      <option value="house">House</option>
-      <option value="villa">Villa</option>
-      <option value="apartment">Apartment</option>
-      <option value="jd">JD</option>
-      <option value="venture">Venture</option>
-    </select><br /><br />
+    <label>
+      Price (₹) *
+      <input type="number" id="price" required />
+    </label>
 
-    <label>Price</label><br />
-    <input type="number" id="price" /><br /><br />
+    <label>
+      Property Type *
+      <select id="type" required>
+        <option value="">Select</option>
+        <option value="plot">Plot</option>
+        <option value="house">House</option>
+        <option value="flat">Flat</option>
+      </select>
+    </label>
 
-    <button type="button" id="saveBtn">Save Draft</button>
-    <button type="button" id="nextBtn">Next: Upload Media</button>
+    <label>
+      Description
+      <textarea id="description"></textarea>
+    </label>
+
+    <button type="button" id="saveDraftBtn">
+      💾 Save Draft
+    </button>
+
+<button type="button" id="nextBtn" disabled>
+  ➡️ Next: Upload Media
+</button>
+
 
   </form>
 
-  <script type="module" src="js/seller/draft.js"></script>
+  <script src="js/utils/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/seller/draft.js"></script>
+
 </body>
 </html>
