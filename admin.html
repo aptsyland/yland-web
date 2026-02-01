@@ -2,27 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>YLAND – Admin Panel</title>
+  <title>Admin Panel | YLAND</title>
   <link rel="stylesheet" href="css/main.css" />
 </head>
 <body>
 
-  <h1>Admin Dashboard</h1>
+<h2>🛠️ Admin – Pending Listings</h2>
 
-  <table border="1" width="100%">
-    <thead>
-      <tr>
-        <th>Listing ID</th>
-        <th>Title</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="adminRows">
-      <!-- JS fills -->
-    </tbody>
-  </table>
+<table border="1" cellpadding="8">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Seller</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="pendingRows">
+    <tr>
+      <td colspan="4">Loading...</td>
+    </tr>
+  </tbody>
+</table>
 
-  <script type="module" src="js/admin.js"></script>
+<script src="js/utils/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/admin.js"></script>
+
 </body>
 </html>

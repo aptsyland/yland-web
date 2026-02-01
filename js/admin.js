@@ -1,62 +1,64 @@
 import { apiGet, apiPost } from "./api.js";
 
-async function loadAdmin() {
-  const res = await apiGet("/api/admin/listings");
+const tbody = document.getElementById("pendingRows");
+
+// --------------------
+// LOAD PENDING LISTINGS
+// --------------------
+async function loadPending() {
+  const res = await apiGet("/api/admin/pendingListings");
 
   if (!res.ok) {
     alert("Admin login required");
     return;
   }
 
-  const tbody = document.getElementById("adminRows");
   tbody.innerHTML = "";
+
+  if (!res.listings || res.listings.length === 0) {
+    tbody.innerHTML =
+      "<tr><td colspan='4'>No pending listings</td></tr>";
+    return;
+  }
 
   for (const l of res.listings) {
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-      <td>${l.listingId}</td>
       <td>${l.title || "-"}</td>
+      <td>${l.sellerName || "-"}</td>
       <td>${l.status}</td>
-      <td>${renderAction(l)}</td>
+      <td>
+        <input
+          type="number"
+          id="amt-${l.listingId}"
+          placeholder="Amount ₹"
+          style="width:100px"
+        />
+        <button onclick="approve('${l.listingId}')">Approve</button>
+        <button onclick="reject('${l.listingId}')">Reject</button>
+      </td>
     `;
 
     tbody.appendChild(tr);
   }
 }
 
-function renderAction(l) {
-  if (l.status === "pending") {
-    return `
-      <input type="number" id="amt-${l.listingId}" placeholder="Amount ₹" />
-      <button onclick="approve('${l.listingId}')">Approve</button>
-      <button onclick="reject('${l.listingId}')">Reject</button>
-    `;
-  }
-
-  if (l.status === "live") {
-    return `<button onclick="pause('${l.listingId}')">Pause</button>`;
-  }
-
-  if (l.status === "paused") {
-    return `<button onclick="resume('${l.listingId}')">Resume</button>`;
-  }
-
-  return "-";
-}
-
-// ✅ ADMIN ACTIONS
+// --------------------
+// APPROVE LISTING
+// --------------------
 window.approve = async function (listingId) {
-  const amt = document.getElementById("amt-" + listingId).value;
+  const amtEl = document.getElementById("amt-" + listingId);
+  const amount = Number(amtEl.value);
 
-  if (!amt) {
-    alert("Enter amount");
+  if (!amount || amount <= 0) {
+    alert("Please enter valid amount");
     return;
   }
 
   const res = await apiPost("/api/admin/approveListing", {
     listingId,
-    amount: Number(amt)
+    amount
   });
 
   if (!res.ok) {
@@ -64,15 +66,24 @@ window.approve = async function (listingId) {
     return;
   }
 
-  alert("Approved & waiting payment");
-  loadAdmin();
+  alert("Approved. Seller waiting for payment.");
+  loadPending();
 };
 
+// --------------------
+// REJECT LISTING
+// --------------------
 window.reject = async function (listingId) {
-  if (!confirm("Reject listing?")) return;
+  const reason = prompt("Enter reject reason");
+
+  if (!reason || !reason.trim()) {
+    alert("Reject reason required");
+    return;
+  }
 
   const res = await apiPost("/api/admin/rejectListing", {
-    listingId
+    listingId,
+    reason
   });
 
   if (!res.ok) {
@@ -80,18 +91,9 @@ window.reject = async function (listingId) {
     return;
   }
 
-  loadAdmin();
+  alert("Listing rejected");
+  loadPending();
 };
 
-window.pause = async function (listingId) {
-  const res = await apiPost("/api/admin/pauseListing", { listingId });
-  if (res.ok) loadAdmin();
-};
-
-window.resume = async function (listingId) {
-  const res = await apiPost("/api/admin/resumeListing", { listingId });
-  if (res.ok) loadAdmin();
-};
-
-// INIT
-loadAdmin();
+// --------------------
+loadPending();
