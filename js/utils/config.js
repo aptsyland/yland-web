@@ -1,6 +1,6 @@
 // js/utils/config.js
 
-export const API_BASE = "http://localhost:8787";
+export const API_BASE = "https://api.yland.in";
 // later replace with https://api.yland.in
 
 export const ROUTES = {
