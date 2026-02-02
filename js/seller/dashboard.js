@@ -53,24 +53,17 @@ function renderAction(l) {
       <button onclick="payNow('${l.listingId}')">
         Pay ₹${l.payableAmount}
       </button>
-    `;
-  }
-
-  if (l.status === "live") {
-    return "LIVE ✅";
-  }
-
-  if (l.status === "expired") {
-    return `
-      <button onclick="renew('${l.listingId}')">
-        RENEW
+      <br/>
+      <button onclick="openProof('${l.listingId}')">
+        Payment Failed?
       </button>
     `;
   }
 
-  if (l.status === "pending") {
-    return "Waiting for admin";
-  }
+  if (l.status === "live") return "LIVE ✅";
+  if (l.status === "expired")
+    return `<button onclick="renew('${l.listingId}')">RENEW</button>`;
+  if (l.status === "pending") return "Waiting for admin";
 
   return "-";
 }
@@ -88,12 +81,11 @@ window.payNow = async function (listingId) {
     return;
   }
 
-  // Redirect to Razorpay
   window.location.href = res.paymentLink;
 };
 
 // --------------------
-// RENEW (AFTER EXPIRY)
+// RENEW
 // --------------------
 window.renew = async function (listingId) {
   const res = await apiPost("/api/seller/startRenew", { listingId });
@@ -105,6 +97,77 @@ window.renew = async function (listingId) {
 
   alert("Renew started. Please complete payment.");
   loadDashboard();
+};
+
+// --------------------
+// PAYMENT PROOF FLOW
+// --------------------
+let currentListingId = null;
+
+window.openProof = function (listingId) {
+  currentListingId = listingId;
+  document.getElementById("proofModal").style.display = "block";
+};
+
+window.closeProof = function () {
+  document.getElementById("proofModal").style.display = "none";
+  document.getElementById("proofFile").value = "";
+  document.getElementById("proofRef").value = "";
+};
+
+// --------------------
+// SUBMIT PROOF (FINAL)
+// --------------------
+window.submitProof = async function () {
+  const file = document.getElementById("proofFile").files[0];
+  const ref = document.getElementById("proofRef").value.trim();
+
+  if (!file || !ref) {
+    alert("Upload proof image and reference required");
+    return;
+  }
+
+  try {
+    // 1️⃣ Get signed URL for proof upload
+    const signRes = await apiPost("/api/seller/getUploadUrl", {
+      fileName: file.name,
+      fileType: file.type,
+      mediaType: "payment-proof"
+    });
+
+    if (!signRes.ok || !signRes.uploadUrl || !signRes.objectKey) {
+      alert("Failed to get upload URL");
+      return;
+    }
+
+    // 2️⃣ Upload proof image to R2
+    await fetch(signRes.uploadUrl, {
+      method: "PUT",
+      body: file,
+      headers: {
+        "Content-Type": file.type
+      }
+    });
+
+    // 3️⃣ Inform backend with reference + proof key
+    const res = await apiPost("/api/seller/uploadPaymentProof", {
+      listingId: currentListingId,
+      reference: ref,
+      proofKey: signRes.objectKey
+    });
+
+    if (!res.ok) {
+      alert(res.error || "Proof submit failed");
+      return;
+    }
+
+    alert("Payment proof submitted. Admin will verify.");
+    closeProof();
+    loadDashboard();
+
+  } catch (e) {
+    alert("Proof upload failed");
+  }
 };
 
 // --------------------

@@ -24,25 +24,58 @@ async function loadPending() {
   for (const l of res.listings) {
     const tr = document.createElement("tr");
 
-    tr.innerHTML = `
-      <td>${l.title || "-"}</td>
-      <td>${l.sellerName || "-"}</td>
-      <td>${l.status}</td>
-      <td>
+    let actionHtml = "-";
+
+    // 🔹 PENDING → approve / reject
+    if (l.status === "pending") {
+      actionHtml = `
         <input
           type="number"
           id="amt-${l.listingId}"
           placeholder="Amount ₹"
-          style="width:100px"
+          style="width:90px"
         />
         <button onclick="approve('${l.listingId}')">Approve</button>
         <button onclick="reject('${l.listingId}')">Reject</button>
-      </td>
+      `;
+    }
+
+    // 🔹 PAYMENT PROOF SUBMITTED → manual confirm
+    else if (l.status === "waiting_payment" && l.paymentProof) {
+      actionHtml = `
+        <button onclick="confirmPaid('${l.listingId}')">
+          Mark as PAID
+        </button>
+      `;
+    }
+
+    tr.innerHTML = `
+      <td>${l.title || "-"}</td>
+      <td>${l.sellerName || "-"}</td>
+      <td>${l.status}</td>
+      <td>${actionHtml}</td>
     `;
 
     tbody.appendChild(tr);
   }
 }
+
+// --------------------
+// MANUAL PAID CONFIRM
+// --------------------
+window.confirmPaid = async function (listingId) {
+  if (!confirm("Confirm payment received?")) return;
+
+  const res = await apiPost("/api/admin/markPaidManual", { listingId });
+
+  if (!res.ok) {
+    alert(res.error || "Manual confirm failed");
+    return;
+  }
+
+  alert("Marked as PAID. Listing is LIVE.");
+  loadPending();
+};
 
 // --------------------
 // APPROVE LISTING

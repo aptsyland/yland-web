@@ -41,5 +41,18 @@
   <script src="js/api.js"></script>
   <script type="module" src="js/seller/dashboard.js"></script>
 
+
+  <!-- PAYMENT PROOF MODAL -->
+<div id="proofModal" style="display:none; border:1px solid #ccc; padding:10px; margin-top:20px;">
+  <h3>Upload Payment Proof</h3>
+
+  <input type="file" id="proofFile" accept="image/*" /><br/><br/>
+  <input type="text" id="proofRef" placeholder="UTR / Reference number" /><br/><br/>
+
+  <button onclick="submitProof()">Submit Proof</button>
+  <button onclick="closeProof()">Cancel</button>
+</div>
+
+
 </body>
 </html>
