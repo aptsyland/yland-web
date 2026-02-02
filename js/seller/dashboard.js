@@ -44,29 +44,85 @@ async function loadDashboard() {
   }
 }
 
+function daysBetween(dateStr) {
+  if (!dateStr) return null;
+
+  const today = new Date();
+  const target = new Date(dateStr);
+
+  const diffMs = target - today;
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+
 // --------------------
 // ACTION RENDER
 // --------------------
 function renderAction(l) {
+  // 🔹 LIVE LISTING
+  if (l.status === "live") {
+    const daysLeft = daysBetween(l.expiresAt);
+
+    if (daysLeft !== null) {
+      if (daysLeft > 0) {
+        return `
+          LIVE ✅<br/>
+          <small style="color:#d97706">
+            ⏰ Expires in ${daysLeft} day${daysLeft > 1 ? "s" : ""}
+          </small>
+        `;
+      }
+
+      // safety fallback
+      return "LIVE ✅";
+    }
+
+    return "LIVE ✅";
+  }
+
+  // 🔹 WAITING PAYMENT
   if (l.status === "waiting_payment") {
     return `
       <button onclick="payNow('${l.listingId}')">
         Pay ₹${l.payableAmount}
-      </button>
-      <br/>
+      </button><br/>
       <button onclick="openProof('${l.listingId}')">
         Payment Failed?
       </button>
     `;
   }
 
-  if (l.status === "live") return "LIVE ✅";
-  if (l.status === "expired")
-    return `<button onclick="renew('${l.listingId}')">RENEW</button>`;
-  if (l.status === "pending") return "Waiting for admin";
+  // 🔹 EXPIRED (GRACE PERIOD)
+  if (l.status === "expired") {
+    const daysAfterExpiry = daysBetween(l.deletedAt || l.expiredAt);
+
+    if (daysAfterExpiry !== null && daysAfterExpiry < 0) {
+      const graceLeft = Math.abs(daysAfterExpiry);
+
+      if (graceLeft <= 6) {
+        return `
+          <span style="color:red">Expired</span><br/>
+          <small>
+            🕒 ${6 - graceLeft} days left to renew
+          </small><br/>
+          <button onclick="renew('${l.listingId}')">RENEW</button>
+        `;
+      }
+    }
+
+    return `
+      <span style="color:red">Expired</span><br/>
+      <button onclick="renew('${l.listingId}')">RENEW</button>
+    `;
+  }
+
+  // 🔹 PENDING
+  if (l.status === "pending") {
+    return "Waiting for admin";
+  }
 
   return "-";
 }
+
 
 // --------------------
 // PAY NOW
