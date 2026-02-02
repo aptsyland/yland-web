@@ -44,11 +44,17 @@ async function loadDashboard() {
   }
 }
 
+// --------------------
+// DATE HELPER (SAFE)
+// --------------------
 function daysBetween(dateStr) {
   if (!dateStr) return null;
 
   const today = new Date();
   const target = new Date(dateStr);
+
+  // 🔒 Edge case safety
+  if (isNaN(target.getTime())) return null;
 
   const diffMs = target - today;
   return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
@@ -58,22 +64,18 @@ function daysBetween(dateStr) {
 // ACTION RENDER
 // --------------------
 function renderAction(l) {
+
   // 🔹 LIVE LISTING
   if (l.status === "live") {
     const daysLeft = daysBetween(l.expiresAt);
 
-    if (daysLeft !== null) {
-      if (daysLeft > 0) {
-        return `
-          LIVE ✅<br/>
-          <small style="color:#d97706">
-            ⏰ Expires in ${daysLeft} day${daysLeft > 1 ? "s" : ""}
-          </small>
-        `;
-      }
-
-      // safety fallback
-      return "LIVE ✅";
+    if (daysLeft !== null && daysLeft > 0) {
+      return `
+        LIVE ✅<br/>
+        <small style="color:#d97706">
+          ⏰ Expires in ${daysLeft} day${daysLeft > 1 ? "s" : ""}
+        </small>
+      `;
     }
 
     return "LIVE ✅";
@@ -96,13 +98,15 @@ function renderAction(l) {
     const daysAfterExpiry = daysBetween(l.deletedAt || l.expiredAt);
 
     if (daysAfterExpiry !== null && daysAfterExpiry < 0) {
-      const graceLeft = Math.abs(daysAfterExpiry);
+      const graceUsed = Math.abs(daysAfterExpiry);
 
-      if (graceLeft <= 6) {
+      if (graceUsed <= 6) {
+        const graceLeft = 6 - graceUsed;
+
         return `
           <span style="color:red">Expired</span><br/>
-          <small>
-            🕒 ${6 - graceLeft} days left to renew
+          <small style="color:#b91c1c">
+            ⏳ Renew within ${graceLeft} day${graceLeft > 1 ? "s" : ""} to avoid deletion
           </small><br/>
           <button onclick="renew('${l.listingId}')">RENEW</button>
         `;
@@ -122,7 +126,6 @@ function renderAction(l) {
 
   return "-";
 }
-
 
 // --------------------
 // PAY NOW
@@ -172,7 +175,7 @@ window.closeProof = function () {
 };
 
 // --------------------
-// SUBMIT PROOF (FINAL)
+// SUBMIT PROOF
 // --------------------
 window.submitProof = async function () {
   const file = document.getElementById("proofFile").files[0];
@@ -184,7 +187,6 @@ window.submitProof = async function () {
   }
 
   try {
-    // 1️⃣ Get signed URL for proof upload
     const signRes = await apiPost("/api/seller/getUploadUrl", {
       fileName: file.name,
       fileType: file.type,
@@ -196,7 +198,6 @@ window.submitProof = async function () {
       return;
     }
 
-    // 2️⃣ Upload proof image to R2
     await fetch(signRes.uploadUrl, {
       method: "PUT",
       body: file,
@@ -205,7 +206,6 @@ window.submitProof = async function () {
       }
     });
 
-    // 3️⃣ Inform backend with reference + proof key
     const res = await apiPost("/api/seller/uploadPaymentProof", {
       listingId: currentListingId,
       reference: ref,
